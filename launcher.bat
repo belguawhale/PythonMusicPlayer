@@ -1,4 +1,4 @@
 @echo off
 chcp 65001
-python musicplayer.py
+py -3.5 musicplayer.py
 pause

@@ -16,14 +16,18 @@ def do_input():
         sys.stdout.flush()
     while msvcrt.kbhit(): # maybe replace with while
         raw_ch = msvcrt.getch()
-        #print(raw_ch)
+        if raw_ch == b'\x00':
+            continue
+        # print(repr(raw_ch))
         try:
             ch = raw_ch.decode('utf-8')
         except UnicodeDecodeError:
             ch = raw_ch
 
         if isinstance(ch, bytes):
-            if ch == b'\xe0':
+            if ch == b'\x00':
+                continue
+            elif ch == b'\xe0':
                 raw_ch = msvcrt.getch()
                 try:
                     next_ch = raw_ch.decode('utf-8')

@@ -11,6 +11,7 @@ import random
 import urllib.request
 import youtube_dl.utils
 import time
+import json
 
 from threading import Thread
 import downloader
@@ -18,7 +19,7 @@ import downloader
 from pygame.locals import *
 
 pygame.mixer.pre_init(44100, -16, 2, 2048)
-# pygame.mixer.pre_init(48000, -16, 2, 2048)
+#pygame.mixer.pre_init(48000, -16, 2, 2048)
 
 pygame.mixer.init()
 pygame.init()
@@ -49,7 +50,7 @@ def play(file):
         pygame.mixer.music.load(file)
         pygame.mixer.music.play()
         msvcrt_input.do_output("Now playing {}.".format(file))
-        pygame.mixer.music.set_endevent(pygame.USEREVENT)
+        #pygame.mixer.music.set_endevent(pygame.USEREVENT)
     except:
         msvcrt_input.do_output("Unable to open file {}".format(file))
         pygame.event.post(pygame.event.Event(pygame.USEREVENT))
@@ -167,14 +168,14 @@ def cmd_search(parameters):
         flags.append('default')
 
     musicpath = os.path.join(os.path.expanduser("~"), "Music")
-    youtubedlpath = os.path.join(os.path.expanduser("~"), "Documents\\!Temp\\youtube-dl")
+    #youtubedlpath = os.path.join(os.path.expanduser("~"), "Documents\\!Temp\\youtube-dl")
     currentpath = os.path.abspath(".")
     pattern = parameters if '.' in parameters else parameters + '.[mwo][pag][3vg]'
 
     if 'path' in flags:
         songs = find(pattern, currentpath, flags)
     else:
-        songs = find(pattern, currentpath, flags) + find(pattern, musicpath, flags) + find(pattern, youtubedlpath, flags)
+        songs = find(pattern, currentpath, flags) + find(pattern, musicpath, flags)# + find(pattern, youtubedlpath, flags)
 
     if len(songs) == 0:
         return "No files found."
@@ -279,6 +280,19 @@ def cmd_ytsearch(parameters):
     else:
         return commands['ytsearch'][1]
 
+@cmd('save', 'save <playlist name>\n\nSaves current queue to <playlist name>. Format is json in file <playlist name>.txt')
+def cmd_save(parameters):
+    with open(parameters + '.txt', 'w') as f:
+        json.dump([now_playing] + music, f)
+    return "Saved {} songs to {}.txt".format(len(music) + 1, parameters)
+     
+@cmd('load', 'load <playlist name>\n\nLoads playlist from <playlist name>.txt')
+def cmd_load(parameters):
+    with open(parameters + '.txt', 'r') as f:
+        songs = json.load(f)
+    music.extend(songs)
+    return "Successfully loaded {} songs from {}.txt".format(len(songs), parameters)
+     
 # lines = []
 # lines.append(['', 0])
 # line = 0

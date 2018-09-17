@@ -1,23 +1,29 @@
 import youtube_dl
+import msvcrt_input
+
+msvcrt_input.prefix = "> "
 
 class MyLogger(object):
     def debug(self, msg):
         pass
 
     def warning(self, msg):
-        pass
+        msvcrt_input.do_output(msg)
 
     def error(self, msg):
-        print(msg)
+        msvcrt_input.do_output(msg)
 
 ytdl_opts = {
     # 'format': 'bestaudio/best', # old, ytdl uses format_id
-    'format_id' : 'bestaudio[asr=44100]', # goddamnit ffmpeg defaulting to 48000 Hz sample rate and screwing up pygame
+    'format_id' : 'bestaudio/best', # 'bestaudio[asr=44100]/best[asr=44100]/mp3[asr=44100]', \
+                                    # goddamnit ffmpeg defaulting to 48000 Hz sample rate and screwing up pygame
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
-        'preferredquality': '256',#'192',
+        'preferredquality': '192'
     }],
+    'preferffmpeg': True,
+    'postprocessor_args': ['-ar', '44100'], # finally fixed the sample rate problems
     'extractaudio' : True,
     'audioformat' : 'mp3',
     #'logger': MyLogger(),
@@ -28,7 +34,9 @@ ytdl_opts = {
     # 'progress_hooks': [my_hook],
     'outtmpl' : './downloaded/%(title)s-%(id)s.%(ext)s',
     'restrictfilenames' : True,
-    'quiet' : True
+    'quiet' : True,
+    #'no_warnings': True,
+    #'ignoreerrors': True
 }
 # ytdl_opts = {
 #     'format': 'bestaudio/best',
